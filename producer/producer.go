@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/Shopify/sarama"
+	"log"
 	"time"
 )
 
@@ -22,7 +23,11 @@ func main() {
 		fmt.Println("生产者连接失败, 报错:", err)
 		return
 	}
-	defer client.Close()
+	defer func() {
+		if err := client.Close(); err != nil {
+			log.Fatalln("关闭客户端失败：" + err.Error())
+		}
+	}()
 	//发送消息
 	pid, offset, err := client.SendMessage(msg)
 	if err != nil {
